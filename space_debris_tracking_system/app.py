@@ -1,37 +1,22 @@
+# app.py
 import streamlit as st
-import pymongo
-from bson.json_util import dumps
-
-# MongoDB connection
-try:
-    client = pymongo.MongoClient("mongodb://localhost:27017/")
-    db = client['spacedebris']
-    collection = db['debris']
-except pymongo.errors.ServerSelectionTimeoutError as err:
-    st.error(f"Could not connect to MongoDB: {err}")
-    st.stop()  # Stop execution if there's a connection error
-
-def load_debris_data():
-    return list(collection.find({}))
-
-def display_debris(debris_data):
-    st.title("Space Debris Tracking System")
-    
-    if debris_data:
-        st.write("### Current Space Debris:")
-        for debris in debris_data:
-            st.write(f"**Name:** {debris['name']}")
-            st.write(f"**Size:** {debris['size']} m")
-            st.write(f"**Mass:** {debris['mass']} kg")
-            st.write(f"**Current Orbit:** {debris['currentOrbit']}")
-            st.write(f"**Last Updated:** {debris['lastUpdated']}")
-            st.write("---")
-    else:
-        st.write("No debris data available.")
+from mongo_db import load_debris_data, insert_initial_data
 
 def main():
+    st.title("Space Debris Tracking System")
+
+    # Insert initial data if not already present
+    insert_initial_data()
+
+    # Load debris data from MongoDB
     debris_data = load_debris_data()
-    display_debris(debris_data)
+
+    if debris_data:
+        st.write("Debris Data:")
+        for debris in debris_data:
+            st.write(debris)
+    else:
+        st.write("No debris data found.")
 
 if __name__ == "__main__":
     main()
