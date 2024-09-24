@@ -2,6 +2,7 @@
 import streamlit as st
 from mongo_db import load_debris_data, insert_initial_data
 
+
 def main():
     st.title("Space Debris Tracking System")
 
