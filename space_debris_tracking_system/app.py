@@ -1,12 +1,15 @@
 import streamlit as st
 import pymongo
 from bson.json_util import dumps
-import json
 
 # MongoDB connection
-client = pymongo.MongoClient("mongodb://localhost:27017/")
-db = client['spacedebris']
-collection = db['debris']
+try:
+    client = pymongo.MongoClient("mongodb://localhost:27017/")
+    db = client['spacedebris']
+    collection = db['debris']
+except pymongo.errors.ServerSelectionTimeoutError as err:
+    st.error(f"Could not connect to MongoDB: {err}")
+    st.stop()  # Stop execution if there's a connection error
 
 def load_debris_data():
     return list(collection.find({}))
